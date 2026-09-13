@@ -6,7 +6,24 @@ all-features = true
 [licenses]
 allow = ["MIT"]
 exceptions = [
-    { allow = ["Apache-2.0"], crate = "unicode-ident" },
+    { allow = ["Apache-2.0"], crate = "buffa" },
+    { allow = ["Apache-2.0"], crate = "buffa-codegen" },
+    { allow = ["Apache-2.0"], crate = "buffa-descriptor" },
+    { allow = ["Apache-2.0"], crate = "connectrpc" },
+    { allow = ["Apache-2.0"], crate = "connectrpc-build" },
+    { allow = ["Apache-2.0"], crate = "connectrpc-codegen" },
+    { allow = ["Zlib"], crate = "foldhash" },
+    { allow = ["ISC"], crate = "is_ci" },
+    { allow = ["MIT", "BSD-3-Clause"], crate = "matchit" },
+    { allow = ["Apache-2.0"], crate = "miette" },
+    { allow = ["Apache-2.0"], crate = "miette-derive" },
+    { allow = ["Apache-2.0"], crate = "ryu" },
+    { allow = ["Apache-2.0"], crate = "supports-color" },
+    { allow = ["Apache-2.0"], crate = "supports-hyperlinks" },
+    { allow = ["Apache-2.0"], crate = "supports-unicode" },
+    { allow = ["Apache-2.0"], crate = "sync_wrapper" },
+    { allow = ["MIT", "Unicode-3.0"], crate = "unicode-ident" },
+    { allow = ["Apache-2.0"], crate = "unicode-linebreak" },
 ]
 
 [bans]

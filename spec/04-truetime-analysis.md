@@ -1,6 +1,6 @@
 # Bounded-Time Analysis
 
-Cloud9 needs a bounded interval around real UTC. A synchronized point estimate
+BasisDB needs a bounded interval around real UTC. A synchronized point estimate
 is insufficient.
 
 Let a provider return:
@@ -21,12 +21,12 @@ Define uncertainty as:
 epsilon = latest - earliest
 ```
 
-Cloud9 treats this containment rule as a correctness assumption. The deployment
+BasisDB treats this containment rule as a correctness assumption. The deployment
 must use an approved provider that can uphold it.
 
 ## Commit Rule
 
-Cloud9 chooses:
+BasisDB chooses:
 
 ```text
 commit_time >= TT.now().latest
@@ -60,20 +60,20 @@ Bounded time connects their serialization order to real time.
 
 ## ClockBound's Role
 
-AWS ClockBound exposes an interval and clock status to local clients. Cloud9
+AWS ClockBound exposes an interval and clock status to local clients. BasisDB
 uses it as the first implementation of the bounded-time provider contract.
 
-ClockBound is not the transaction protocol. Cloud9 still validates provider
+ClockBound is not the transaction protocol. BasisDB still validates provider
 health, enforces uncertainty policy, assigns timestamps, and performs
 commit-wait.
 
-Cloud9 should describe this mode as TrueTime-shaped. Google TrueTime is a
+BasisDB should describe this mode as TrueTime-shaped. Google TrueTime is a
 specific Google service. The shared idea is an API that returns a trustworthy
 time interval.
 
 ## Hardware Boundary
 
-Cloud9's first TrueTime mode requires supported Linux EC2 hardware, Amazon Time
+BasisDB's first TrueTime mode requires supported Linux EC2 hardware, Amazon Time
 Sync, a precision hardware clock, and ClockBound. The exact supported instance
 families and drivers follow current AWS documentation.
 
@@ -92,7 +92,7 @@ time.
 
 ## Failure Model
 
-Cloud9 rejects the provider when:
+BasisDB rejects the provider when:
 
 - status reports unsynchronized or unknown time;
 - uncertainty exceeds configured policy;
@@ -116,5 +116,5 @@ A production backend needs evidence for:
 6. A maximum accepted uncertainty policy.
 7. End-to-end histories that verify strict serializability.
 
-Unit tests can prove Cloud9's interval arithmetic. Hardware integration tests
+Unit tests can prove BasisDB's interval arithmetic. Hardware integration tests
 must prove the provider assumptions.

@@ -1,6 +1,6 @@
 # AWS ClockBound Backend
 
-Cloud9's first production bounded-time backend uses AWS ClockBound. It is
+BasisDB's first production bounded-time backend uses AWS ClockBound. It is
 available only on hosts that satisfy the declared hardware and software
 contract.
 
@@ -16,7 +16,7 @@ A TrueTime-enabled node requires:
 - a healthy ClockBound daemon and client library;
 - permission to read the ClockBound shared-memory segment.
 
-The current instance and driver matrix belongs to AWS documentation. Cloud9
+The current instance and driver matrix belongs to AWS documentation. BasisDB
 should test capabilities instead of embedding a stale family list.
 
 ## Data Path
@@ -32,12 +32,12 @@ ClockBound daemon
         |
 ClockBound client
         |
-Cloud9 TimeSource
+BasisDB TimeSource
         |
 timestamp assignment and commit-wait
 ```
 
-The provider returns an earliest time, latest time, and status. Cloud9 converts
+The provider returns an earliest time, latest time, and status. BasisDB converts
 those values into its internal time interval without discarding the PHC error
 bound.
 
@@ -58,7 +58,7 @@ implementation.
 
 ## Runtime Checks
 
-Every time sample carries provider status. Cloud9 rejects a sample before using
+Every time sample carries provider status. BasisDB rejects a sample before using
 it when status is unhealthy or its interval violates policy.
 
 The node publishes:
@@ -73,15 +73,15 @@ The node publishes:
 Alerts should fire before uncertainty reaches the rejection threshold.
 
 All nodes use one time scale. AWS NTP smears leap seconds while the PHC does
-not. Cloud9 rejects a mixed configuration.
+not. BasisDB rejects a mixed configuration.
 
 ## Failure Behavior
 
-When ClockBound becomes unavailable, Cloud9 fails operations whose correctness
+When ClockBound becomes unavailable, BasisDB fails operations whose correctness
 depends on bounded time. The node reports a typed provider error and becomes
 unready for those operations.
 
-Cloud9 does not:
+BasisDB does not:
 
 - read the ordinary system clock as a substitute;
 - replace the provider with an HLC;
@@ -94,11 +94,11 @@ provider contract.
 
 ## ClockBound and TrueTime
 
-ClockBound supplies a host-local bounded-time interval. Cloud9 supplies the
+ClockBound supplies a host-local bounded-time interval. BasisDB supplies the
 database protocol that consumes it.
 
 The integration is TrueTime-shaped because both expose an interval around real
-time. Cloud9 does not claim to run Google's TrueTime service.
+time. BasisDB does not claim to run Google's TrueTime service.
 
 ## Security Boundary
 

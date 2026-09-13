@@ -1,16 +1,16 @@
-# Cloud9 Jepsen
+# BasisDB Jepsen
 
-This harness is a Jepsen `db/DB` wrapper for the real Cloud9 `c9` binary. It
-uploads `target/release/c9` to every DB node, writes a per-node `cloud9.toml`,
-starts `c9 start --config /opt/cloud9/cloud9.toml` with Jepsen's
-`start-daemon!`, and drives Cloud9's public KV API with a shared
+This harness is a Jepsen `db/DB` wrapper for the real BasisDB `bdb` binary. It
+uploads `target/release/bdb` to every DB node, writes a per-node `basisdb.toml`,
+starts `bdb start --config /opt/basisdb/basisdb.toml` with Jepsen's
+`start-daemon!`, and drives BasisDB's public KV API with a shared
 linearizable register workload.
 
 Each node requires the same 256-bit `cluster.raft_key`; peer RPC bodies are
 authenticated with HMAC-SHA256 before deserialization. The checked-in example
 key is only for local and Jepsen testing.
 
-Cloud9 treats SQL, key-value, document, object, and analytical APIs as source
+BasisDB treats SQL, key-value, document, object, and analytical APIs as source
 dialects. The KV API is the first implemented dialect and the smallest
 interface Jepsen can drive today. It does not define the final storage model.
 
@@ -40,7 +40,7 @@ lein run test \
   --time-limit 60 \
   --concurrency 5n \
   --stagger 0.01 \
-  --binary ../target/release/c9
+  --binary ../target/release/bdb
 ```
 
 Useful knobs:
@@ -58,7 +58,7 @@ serving node-local state.
 
 ## Current Limit
 
-`c9 start` persists Raft hard state and log entries before sending network
+`bdb start` persists Raft hard state and log entries before sending network
 effects, then reconstructs KV state by replaying committed commands. Snapshot
 transfer, log compaction, read forwarding, and richer nemesis coverage are not
 complete yet. Without snapshot-backed reclamation, the WAL grows to its 4 GiB

@@ -3,7 +3,7 @@
   "release-type": "rust",
   "packages": {
     ".": {
-      "component": "cloud9",
+      "component": "basisdb",
       "changelog-path": "CHANGELOG.md"
     }
   },

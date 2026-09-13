@@ -1,5 +1,5 @@
 doc-valid-idents = [
-  "Cloud9",
+  "BasisDB",
   "HLC",
   "MVCC",
   "SQL",

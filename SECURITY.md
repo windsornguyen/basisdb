@@ -2,7 +2,7 @@
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability in Cloud9, please report it privately to our security team.
+If you discover a security vulnerability in BasisDB, please report it privately to our security team.
 
 **Do not** create a public GitHub issue for security vulnerabilities.
 
@@ -31,28 +31,28 @@ Include the following information:
 
 ## Supported Versions
 
-Cloud9 is currently in active development. Security updates will be provided for:
+BasisDB is currently in active development. Security updates will be provided for:
 
 | Version | Supported          |
 | ------- | ------------------ |
 | main    | :white_check_mark: |
 | < 1.0   | :x:                |
 
-Once Cloud9 reaches 1.0, we will maintain security support for the latest major version.
+Once BasisDB reaches 1.0, we will maintain security support for the latest major version.
 
 ## Security Best Practices
 
-When deploying Cloud9:
+When deploying BasisDB:
 
 1. **Keep dependencies updated**: Regularly run `cargo update` and monitor security advisories
 2. **Use TLS**: Always enable TLS for client connections in production
-3. **Limit network exposure**: Run Cloud9 behind a firewall or VPC
+3. **Limit network exposure**: Run BasisDB behind a firewall or VPC
 4. **Monitor logs**: Watch for unusual access patterns or errors
 5. **Follow the principle of least privilege**: Grant minimal necessary permissions
 
 ## Security Audits
 
-Cloud9 has not yet undergone a formal security audit. As the project matures, we plan to engage third-party security researchers for comprehensive audits.
+BasisDB has not yet undergone a formal security audit. As the project matures, we plan to engage third-party security researchers for comprehensive audits.
 
 ## Contact
 

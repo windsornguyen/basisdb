@@ -1,347 +1,94 @@
-# Contributing to Cloud9
+# Contributing to BasisDB
 
-Thank you for your interest in contributing to Cloud9. This document provides guidelines and instructions for setting up your development environment, running tests, and submitting changes.
+BasisDB is developed in the open under the MIT license. Start with the
+[vision](spec/00-vision.md) and the specification for the subsystem you want to
+change. Specifications describe the target; the [README](README)
+identifies what is implemented.
 
-## Code of Conduct
+## Build and Run
 
-This project adheres to a code of conduct that all contributors are expected to follow. Be respectful, inclusive, and professional in all interactions.
-
-## Development Setup
-
-### Prerequisites
-
-- **Rust**: 1.95.0 or later (install via [rustup](https://rustup.rs/))
-- **protoc**: Required to generate the Connect RPC types
-- **Git**: For version control
-- **Cargo tools**:
-  ```bash
-  cargo install cargo-nextest  # Faster test runner
-  cargo install cargo-watch    # Auto-rebuild on changes
-  ```
-
-### Clone and Build
+Install Rust 1.95 with rustfmt and clippy, plus `protoc` for generated RPC types.
+The repository pins the Rust toolchain in `rust-toolchain.toml`.
 
 ```bash
-git clone https://github.com/dedalus-labs/cloud9
-cd cloud9
-cargo build
+git clone https://github.com/windsornguyen/basisdb
+cd basisdb
+cargo build --workspace --locked
+cargo run -p basisdb --bin bdb -- check-config --config basisdb.example.toml
+cargo run -p basisdb --bin bdb -- start --config basisdb.example.toml
 ```
 
-### Running Cloud9
+The example starts one local replica. Its key is for development only. Use
+`RUST_LOG=basisdb=debug` for diagnostic logging. The default configuration path
+is `basisdb.toml`.
+
+## Workspace
+
+| Path | Responsibility |
+| --- | --- |
+| `basisdb/` | `bdb` executable and configuration loading |
+| `basisdb-core/` | Shared filesystem, string, and synchronization utilities |
+| `basisdb-node/` | Replicated KV service, Raft runtime, and peer transport |
+| `basisdb-proto/` | Protobuf definitions and generated Connect RPC types |
+| `basisdb-storage/` | Storage configuration |
+| `basisdb-wal/` | Segmented write-ahead log and recovery |
+| `consensus/basisdb-raft/` | I/O-free Raft state machine |
+| `consensus/basisdb-raft-io/` | Consensus I/O contracts and client helpers |
+| `jepsen/` | Clojure harness for testing the public KV service |
+| `spec/` | Target architecture and implementation order |
+
+## Checks
+
+Run the same Rust checks used by CI:
 
 ```bash
-# Single-node instance
-cargo run --bin c9 -- start --config cloud9.example.toml
-
-# With debug logging
-RUST_LOG=debug cargo run --bin c9 -- start --config cloud9.example.toml
-```
-
-## Testing
-
-Cloud9 has a multi-layered test strategy to ensure correctness and reliability.
-
-### Unit Tests
-
-Unit tests live alongside implementation code and cover individual components.
-
-```bash
-# Run all unit tests
-cargo test --workspace
-
-# Run tests for a specific crate
-cargo test -p cloud9-kv
-
-# Run a specific test
-cargo test test_mvcc_snapshot_isolation
-```
-
-### Integration Tests
-
-Integration tests live in `tests/` directories and validate end-to-end behavior.
-
-```bash
-# Run integration tests
-cargo test --workspace --test '*'
-
-# Run with nextest (faster, better output)
-cargo nextest run --workspace
-```
-
-### Concurrency Tests (Loom)
-
-Loom tests explore all possible thread interleavings to catch concurrency bugs.
-
-```bash
-# Run loom tests (requires --cfg loom)
-RUSTFLAGS="--cfg loom" cargo test --release --lib loom
-
-# Run specific loom test
-RUSTFLAGS="--cfg loom" cargo test --release -p cloud9-txn loom_lock_manager
-```
-
-**Note**: Loom tests are expensive. Set limits for faster iteration:
-```bash
-LOOM_MAX_PREEMPTIONS=2 LOOM_MAX_BRANCHES=5000 RUSTFLAGS="--cfg loom" cargo test --release loom
-```
-
-### Simulation Tests
-
-Deterministic simulation tests run the full system in a virtual environment with controlled time, network, and disk.
-
-```bash
-# Run simulation tests
-cargo test -p cloud9-sim --release
-
-# Run specific scenario
-cargo test -p cloud9-sim --release test_partition_during_commit
-
-# Long chaos run
-cargo test -p cloud9-sim --release --ignored
-```
-
-### Property Tests
-
-Property-based tests use `proptest` to generate random inputs and verify invariants.
-
-```bash
-# Run property tests
-cargo test prop_
-
-# Run with more cases
-PROPTEST_CASES=10000 cargo test prop_mvcc_serializability
-```
-
-### Jepsen-Style Tests
-
-External consistency checkers validate distributed correctness properties.
-
-```bash
-# Run Jepsen harness (requires Docker)
-cargo build --release -p cloud9-jepsen
-docker compose -f tests/jepsen/docker-compose.yml up
-
-# Analyze history
-cargo run -p cloud9-jepsen -- check history.edn
-```
-
-### Benchmarks
-
-```bash
-# Run all benchmarks
-cargo bench --workspace
-
-# Run specific benchmark
-cargo bench -p cloud9-kv mvcc_write_throughput
-```
-
-### Full Test Suite
-
-Before submitting a PR, run the full suite:
-
-```bash
-# Standard tests
-cargo test --workspace
-cargo clippy --workspace --all-targets -- -D warnings
 cargo fmt --all -- --check
-
-# Concurrency tests
-RUSTFLAGS="--cfg loom" cargo test --release --lib loom
-
-# Simulation (quick)
-cargo test -p cloud9-sim --release
+cargo clippy --workspace --all-targets --locked -- -D warnings
+cargo test --workspace --locked
+cargo doc --workspace --no-deps --locked
 ```
 
-## Code Style
-
-Cloud9 follows standard Rust conventions with additional rules defined in `clippy.toml` and `rustfmt.toml`.
-
-### Formatting
+For Raft changes, the property and state-machine suites exercise generated
+event sequences through the public API:
 
 ```bash
-# Check formatting
-cargo fmt --all -- --check
-
-# Apply formatting
-cargo fmt --all
+cargo test -p basisdb-raft --test property --test state_machine --locked
 ```
 
-### Linting
+Cross-reference Raft changes with the
+[dissertation checklist](consensus/basisdb-raft/DISSERTATION_CHECKLIST.md).
+Keep source citations and focused tests current when changing consensus code.
+
+### Jepsen
+
+With Java and Leiningen installed:
 
 ```bash
-# Run clippy
-cargo clippy --workspace --all-targets -- -D warnings
-
-# Fix auto-fixable issues
-cargo clippy --workspace --all-targets --fix
+cd jepsen
+lein check
+lein test
 ```
 
-### Documentation
+These check the harness. A distributed correctness result requires running a
+cluster and checking its execution history. Follow the
+[Jepsen instructions](jepsen/README.md) to build the Linux binary and run a test.
 
-- Public APIs must have doc comments
-- Use `///` for item documentation, `//!` for module documentation
-- Include examples in doc comments when helpful
-- Run `cargo doc --open` to preview
+## Changes and Review
 
-```rust
-/// Commits a transaction at the given timestamp.
-///
-/// # Errors
-///
-/// Returns `CommitError::ConflictDetected` if a write-write conflict exists.
-///
-/// # Example
-///
-/// ```
-/// let ts = coordinator.commit(txn_id, commit_ts).await?;
-/// ```
-pub async fn commit(&self, txn_id: TxnId, commit_ts: Timestamp) -> Result<(), CommitError> {
-    // ...
-}
-```
+Keep changes small and scoped to one behavior. Prefer explicit invariants,
+typed errors, and the existing interfaces. Keep source files under 500 lines
+where practical; avoid abstractions without a real consumer.
 
-## Project Structure
+Behavior changes need focused tests. A regression test should demonstrate the
+failure before the fix and exercise the corrected invariant afterward. Name
+the precise workload and conditions for any performance or correctness claim.
 
-```
-cloud9/
-├── crates/
-│   ├── cloud9/              # Core database binary and library
-│   ├── cloud9-kv/           # MVCC key-value storage
-│   ├── cloud9-raft/         # Consensus implementation
-│   ├── cloud9-txn/          # Transaction coordinator
-│   ├── cloud9-sql/          # SQL layer
-│   ├── cloud9-client/       # Client SDK
-│   ├── cloud9-test/         # Test utilities
-│   ├── cloud9-sim/          # Deterministic simulator
-│   ├── cloud9-jepsen/       # Jepsen harness
-│   └── cloud9-bench/        # Benchmarks
-├── .github/workflows/       # CI configuration
-├── docs/                    # Additional documentation
-├── Cargo.toml               # Workspace configuration
-├── clippy.toml              # Clippy configuration
-└── rustfmt.toml             # Rustfmt configuration
-```
+Use Conventional Commits, such as `fix(consensus): preserve committed log entries`.
+See the [commit workflow](.agents/skills/commit/SKILL.md) for scope selection and validation.
+Follow the [pull request template](.github/PULL_REQUEST_TEMPLATE.md), document
+breaking changes, and include the checks you ran. All workspace crates share
+one release version.
 
-## Making Changes
-
-### Workflow
-
-1. **Fork** the repository
-2. **Create a branch** for your changes: `git checkout -b feature/my-feature`
-3. **Make your changes** with clear, logical commits
-4. **Add tests** for new functionality
-5. **Run the test suite** (see Testing section)
-6. **Update documentation** if needed
-7. **Push** to your fork and **open a Pull Request**
-
-### Commit Messages
-
-Cloud9 follows [Conventional Commits](https://www.conventionalcommits.org/):
-
-```
-<type>(<scope>): <description>
-
-[optional body]
-
-[optional footer]
-```
-
-**Types**:
-- `feat`: New feature
-- `fix`: Bug fix
-- `perf`: Performance improvement
-- `refactor`: Code restructuring without behavior change
-- `test`: Adding or updating tests
-- `docs`: Documentation changes
-- `chore`: Build, CI, or tooling changes
-
-**Scopes**: `core`, `consensus`, `storage`, `node`, `proto`, `ci`, `deps`,
-`docs`
-
-**Examples**:
-```
-feat(core): implement bounded-time commit-wait
-
-Reject unhealthy time intervals and delay acknowledgment until the commit
-timestamp is certainly in the past.
-
-Closes #123
-```
-
-```
-fix(kv): prevent stale reads during range split
-
-Ensure that follower reads check applied index before serving
-snapshots at a timestamp that spans a range boundary.
-```
-
-### Versioning
-
-Cloud9 follows [Semantic Versioning](https://semver.org/):
-- **MAJOR** (x.0.0): Breaking API changes
-- **MINOR** (0.x.0): New features, backward compatible
-- **PATCH** (0.0.x): Bug fixes, backward compatible
-
-All crates in the workspace share the same version and are released together. This ensures consistency across the project and simplifies dependency management.
-
-### Pull Request Guidelines
-
-- **Title**: Clear and descriptive
-- **Description**: Explain what changed and why
-- **Tests**: Include test coverage for new code
-- **Documentation**: Update docs if behavior changed
-- **Breaking changes**: Call out explicitly
-
-Your PR must pass:
-- All test suites (unit, integration, loom, sim)
-- Clippy without warnings
-- Rustfmt checks
-- No new compiler warnings
-
-CI will run these checks automatically. You can run them locally before pushing.
-
-## Testing Requirements
-
-All contributions must meet these testing standards:
-
-### Unit Tests
-- Every public function must have test coverage
-- Edge cases and error paths must be tested
-- Use `#[cfg(test)]` modules in the same file
-
-### Integration Tests
-- New features require end-to-end integration tests
-- Place in `tests/` directory or crate-specific `tests/` folder
-
-### Concurrency Tests
-- Any code touching shared state requires loom tests
-- Lock managers, MVCC structures, and coordination logic are critical
-
-### Property Tests
-- Stateful components (MVCC, txn coordinator) require property tests
-- Define clear invariants and verify with proptest
-
-### Simulation Tests
-- Distributed logic (2PC, range splits, replication) requires sim tests
-- Test under partition, crash, and time skew scenarios
-
-### Documentation Tests
-- Public API examples in doc comments must compile and run
-- Use ` ```rust` blocks for runnable examples
-
-## Performance Considerations
-
-- Avoid allocations in hot paths
-- Use `#[inline]` for small, frequently called functions
-- Profile before optimizing: `cargo flamegraph`
-- Benchmark regressions are caught in CI
-
-## Questions and Help
-
-- **Issues**: Open an issue for bugs or feature requests
-- **Discussions**: Use GitHub Discussions for questions
-- **Security**: Report vulnerabilities privately to <security@dedaluslabs.ai>
-
-## License
-
-By contributing to Cloud9, you agree that your contributions will be licensed under the [MIT License](LICENSE).
+Follow the [code of conduct](CODE_OF_CONDUCT.md). Report vulnerabilities through
+the [security policy](SECURITY.md), not a public issue. Contributions are
+licensed under the [MIT License](LICENSE).

@@ -1,6 +1,6 @@
 # Consensus and Replication
 
-Cloud9 uses Raft for replicated ordering. Raft remains a small, deterministic
+BasisDB uses Raft for replicated ordering. Raft remains a small, deterministic
 state machine whose transitions can be tested without storage or networking.
 
 The database node supplies durable storage, transport, timers, and command
@@ -29,7 +29,7 @@ effects that depend on it.
 
 ## Safety Invariants
 
-Cloud9 preserves:
+BasisDB preserves:
 
 1. At most one leader per term.
 2. Committed entries remain in every future leader's log.
@@ -78,7 +78,7 @@ some earlier instant is insufficient.
 
 ## Membership Changes
 
-Replica changes use Raft's supported configuration-change protocol. Cloud9
+Replica changes use Raft's supported configuration-change protocol. BasisDB
 allows one logical membership change at a time per group unless the
 implementation proves a stronger rule.
 
@@ -104,7 +104,7 @@ Upgrade gates verify:
 
 ## Failure Handling
 
-Loss of quorum stops new commits. Cloud9 does not acknowledge an uncommitted
+Loss of quorum stops new commits. BasisDB does not acknowledge an uncommitted
 proposal.
 
 Disk corruption, impossible log state, and snapshot checksum failure are fatal

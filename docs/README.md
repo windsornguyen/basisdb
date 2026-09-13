@@ -1,4 +1,4 @@
-# Cloud9 Documentation
+# BasisDB Documentation
 
 This directory contains historical design notes. The normative specifications
 live in [`/spec/`](../spec/).

@@ -1,6 +1,6 @@
 # Multi-Model Intermediate Representation
 
-Cloud9 is an MLIR for databases. Database APIs are source dialects that lower
+BasisDB is an MLIR for databases. Database APIs are source dialects that lower
 through several typed intermediate representations (IRs).
 
 The common layer is not one universal storage model. It is a conversion system
@@ -9,7 +9,7 @@ execution.
 
 ## Source Dialects
 
-Cloud9 targets:
+BasisDB targets:
 
 - SQL dialects for relational queries and transactions;
 - DynamoDB-style key-value and conditional operations;
@@ -31,7 +31,7 @@ Early lowering to generic key-value operations loses useful information:
 - object versions, ranges, and multipart state;
 - analytical projections, grouping, and ordering.
 
-Cloud9 retains that information until a lower layer can represent it without
+BasisDB retains that information until a lower layer can represent it without
 loss. This enables domain-specific optimization without duplicating
 transactions and replication.
 
@@ -128,7 +128,7 @@ Examples include:
 - retaining a key-value condition until conflict validation;
 - retaining analytical ordering until a physical operator guarantees it.
 
-Cloud9 does not approximate unsupported behavior.
+BasisDB does not approximate unsupported behavior.
 
 ## Cross-Dialect Data
 
@@ -136,7 +136,7 @@ Dialects may share data through an explicit catalog mapping. The mapping
 defines identity, types, nullability, versioning, and ownership.
 
 One physical representation may serve several dialects when their semantics
-align. Otherwise Cloud9 maintains a transactional projection or rejects the
+align. Otherwise BasisDB maintains a transactional projection or rejects the
 mapping.
 
 Cross-dialect transactions use Transaction IR. Atomicity is available only

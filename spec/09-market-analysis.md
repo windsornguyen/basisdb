@@ -1,6 +1,6 @@
 # Product Rationale
 
-Cloud9 addresses fragmentation between database interfaces, execution engines,
+BasisDB addresses fragmentation between database interfaces, execution engines,
 and deployment models.
 
 The product thesis is that one correctness plane can support several
@@ -24,9 +24,9 @@ Distributed databases add another split. Local development often uses a
 different engine from production. The application discovers semantic
 differences during deployment.
 
-## Cloud9's Position
+## BasisDB's Position
 
-Cloud9 combines:
+BasisDB combines:
 
 - Spanner-style external consistency;
 - SQLite-like local operation;
@@ -35,7 +35,7 @@ Cloud9 combines:
 - one transaction, catalog, placement, and replication plane;
 - an MLIR-style lowering and optimization system.
 
-The differentiator is the conversion architecture. Cloud9 does not expose five
+The differentiator is the conversion architecture. BasisDB does not expose five
 protocols over one generic row or key-value engine.
 
 ## Product Requirements
@@ -58,7 +58,7 @@ and physical plan. Unsupported behavior fails at a named conversion boundary.
 Point operations, document updates, object ranges, relational joins, and
 columnar scans need different data structures.
 
-Cloud9 keeps one correctness plane while allowing each workload to use an
+BasisDB keeps one correctness plane while allowing each workload to use an
 appropriate physical engine.
 
 ### Locality as policy
@@ -68,12 +68,12 @@ after-the-fact infrastructure hints.
 
 ### Open operation
 
-Cloud9 is open source and self-hostable. File formats, protocols, limits, and
+BasisDB is open source and self-hostable. File formats, protocols, limits, and
 failure modes are documented and testable.
 
 ## Competitive Categories
 
-| Category | Strength | Cloud9 requirement |
+| Category | Strength | BasisDB requirement |
 |----------|----------|--------------------|
 | Relational databases | SQL and mature transactions | Preserve relational semantics |
 | Key-value stores | Predictable point operations | Match conditional and item behavior |
@@ -83,7 +83,7 @@ failure modes are documented and testable.
 | Distributed SQL | Scale and transactions | Add explicit bounded time and placement |
 | Embedded databases | Simple local use | Keep one binary and one directory |
 
-Cloud9 must earn comparison with each category on its native workload.
+BasisDB must earn comparison with each category on its native workload.
 
 ## Non-Claims
 
@@ -114,6 +114,6 @@ consistency, and software versions.
 
 ## Success
 
-Cloud9 succeeds when an application can begin locally, retain its semantics at
+BasisDB succeeds when an application can begin locally, retain its semantics at
 distributed scale, and use specialized execution without assembling separate
 databases and consistency layers.

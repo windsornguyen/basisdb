@@ -1,20 +1,20 @@
-# Historical Cloud9 Design Notes
+# Historical BasisDB Design Notes
 
 > This document preserves early design discussion. It is not normative and
 > contains superseded decisions, including HLC-based timestamp guidance. Use
 > [the current specifications](../spec/README.md) for implementation.
 
-This document captures the theoretical foundations, architectural decisions, and market insights that define Cloud9.
+This document captures the theoretical foundations, architectural decisions, and market insights that define BasisDB.
 
 ## Vision
 
-**Cloud9 is the distributed database that should have existed from the start.**
+**BasisDB is the distributed database that should have existed from the start.**
 
 Spanner proved that external consistency is achievable with commit-wait and precise time. FoundationDB proved that SQL and KV can share one transactional core. Postgres proved that full ACID with referential integrity is what developers expect. CockroachDB proved that you can build this in the open.
 
 **Nobody combined them all.**
 
-Cloud9 is the synthesis: Spanner's correctness + Postgres's compatibility + FoundationDB's architecture + open-source transparency. No corporate compromises. No vendor lock-in. No "this feature costs extra." Just the theoretically optimal distributed database, available to everyone.
+BasisDB is the synthesis: Spanner's correctness + Postgres's compatibility + FoundationDB's architecture + open-source transparency. No corporate compromises. No vendor lock-in. No "this feature costs extra." Just the theoretically optimal distributed database, available to everyone.
 
 **If you finish a write and start a read, that read sees the write. Anywhere in the world. Always. Provably.**
 
@@ -28,7 +28,7 @@ That's the guarantee. The rest is engineering.
 - [External Consistency Explained](#external-consistency-explained)
 - [Client vs Server Timestamp Assignment](#client-vs-server-timestamp-assignment)
 - [The Commit-Wait Necessity](#the-commit-wait-necessity)
-- [Why Cloud9 Exists: Market Pain Points](#why-cloud9-exists-market-pain-points)
+- [Why BasisDB Exists: Market Pain Points](#why-basisdb-exists-market-pain-points)
 
 ---
 
@@ -71,7 +71,7 @@ MVCC models how time actually works: the past is immutable, observers can choose
 - More aborts, no historical reads
 - Rejected: need multi-version for temporal queries
 
-**Verdict**: MVCC is the only scheme that satisfies Cloud9's requirements (lock-free reads, temporal queries, write concurrency). Every modern OLTP database (Postgres, Spanner, CockroachDB, TiDB) uses MVCC for this reason.
+**Verdict**: MVCC is the only scheme that satisfies BasisDB's requirements (lock-free reads, temporal queries, write concurrency). Every modern OLTP database (Postgres, Spanner, CockroachDB, TiDB) uses MVCC for this reason.
 
 ---
 
@@ -79,7 +79,7 @@ MVCC models how time actually works: the past is immutable, observers can choose
 
 **Question**: Why can't we use Lamport clocks for timestamp assignment?
 
-**Initial thought**: "All replicas are in the Cloud9 cluster, so Lamport clocks should work fine."
+**Initial thought**: "All replicas are in the BasisDB cluster, so Lamport clocks should work fine."
 
 **Reality**: Lamport clocks can't guarantee external consistency, even within one cluster.
 
@@ -144,7 +144,7 @@ Replica B → Oracle: "assign timestamp" → L=51
 
 ## Timestamp Strategies
 
-Cloud9 needs timestamps that respect **real-time order**. Three viable approaches:
+BasisDB needs timestamps that respect **real-time order**. Three viable approaches:
 
 ### 1. Hybrid Logical Clocks (HLC) — Recommended
 
@@ -256,7 +256,7 @@ impl TSO {
 
 **Used by**: FoundationDB (Sequencer), TiDB (PD's TSO)
 
-### Cloud9's Strategy
+### BasisDB's Strategy
 
 **Primary mode**: HLC + commit-wait
 - Decentralized, scales well
@@ -324,7 +324,7 @@ For external consistency, even without network partitions, we must trade latency
 
 **Alternative**: Drop external consistency, use logical timestamps only (faster writes, but can violate user expectations).
 
-**Cloud9's choice**: Pay the latency. External consistency is non-negotiable for "daily driver" database where users expect intuitive behavior.
+**BasisDB's choice**: Pay the latency. External consistency is non-negotiable for "daily driver" database where users expect intuitive behavior.
 
 ---
 
@@ -377,7 +377,7 @@ Some systems (Cassandra, Cosmos DB) let clients provide timestamps for **last-wr
 - No external consistency promise
 - Application-level concern, not database correctness
 
-**Cloud9**: Server-side only. Clients are dumb, database is smart.
+**BasisDB**: Server-side only. Clients are dumb, database is smart.
 
 ---
 
@@ -447,7 +447,7 @@ For external consistency with wall-clock-meaningful timestamps:
 - Wait for order (sequencer/TSO propagation), OR
 - Wait for batch (deterministic pre-ordering)
 
-**Cloud9's choice**: Wait for time (HLC + commit-wait). The latency is proportional to clock quality (tight with PTP, larger with NTP).
+**BasisDB's choice**: Wait for time (HLC + commit-wait). The latency is proportional to clock quality (tight with PTP, larger with NTP).
 
 ### Optimizations
 
@@ -461,7 +461,7 @@ For external consistency with wall-clock-meaningful timestamps:
 
 ## Timestamp Strategies
 
-Cloud9 supports two modes for timestamp assignment.
+BasisDB supports two modes for timestamp assignment.
 
 ### Mode 1: HLC (Decentralized)
 
@@ -487,7 +487,7 @@ On event:
 - After assigning t_w, wait ~ε before ack
 - Fail-stop if observed skew > max_offset
 
-**When to use**: Default for Cloud9. Works on any cloud provider with NTP/PTP.
+**When to use**: Default for BasisDB. Works on any cloud provider with NTP/PTP.
 
 ### Mode 2: TSO (Centralized)
 
@@ -522,7 +522,7 @@ On request: return fetch_add(1)
 | Operational complexity | Clock monitoring | TSO operations |
 | Failure mode | Fail-stop on skew > max | Block if TSO unreachable |
 
-**Cloud9 default**: HLC (matches CockroachDB). TSO mode available for challenging clock environments.
+**BasisDB default**: HLC (matches CockroachDB). TSO mode available for challenging clock environments.
 
 ---
 
@@ -548,7 +548,7 @@ if write_ack_received_before(read_started):
 - Reads observe all commits with timestamps ≤ read timestamp
 - No write can "appear in the future" from a reader's perspective
 
-### How Cloud9 Achieves It
+### How BasisDB Achieves It
 
 **Write path**:
 1. Coordinator assigns t_w from HLC
@@ -573,13 +573,13 @@ if write_ack_received_before(read_started):
 
 **Eventual Consistency**:
 - No ordering guarantees
-- Much cheaper, but unusable for Cloud9's goals
+- Much cheaper, but unusable for BasisDB's goals
 
 **Linearizability** (single-object):
 - Only for single-key operations
-- Cloud9 provides this as a subset (single-key reads/writes are linearizable)
+- BasisDB provides this as a subset (single-key reads/writes are linearizable)
 
-**External consistency = Strict Serializability**: Cloud9's target.
+**External consistency = Strict Serializability**: BasisDB's target.
 
 ---
 
@@ -671,7 +671,7 @@ Independent analysis from multiple sources converged on the same architecture:
 - **Rust** for implementation (memory safety + C-class performance)
 - **Open-core** for business model (trust through transparency)
 
-**What makes Cloud9 unique isn't the individual pieces—it's the synthesis**:
+**What makes BasisDB unique isn't the individual pieces—it's the synthesis**:
 
 Every distributed database uses some of these components. None combine all of them with:
 - SQL and KV unified under one transaction model
@@ -681,13 +681,13 @@ Every distributed database uses some of these components. None combine all of th
 
 **This isn't novel research—it's what distributed databases should have been from the start.** Spanner proved the foundation (external consistency via commit-wait). FoundationDB proved the layering (SQL+KV over one transactional core). Postgres proved the interface (wire compatibility, full ACID).
 
-Cloud9 is the **disciplined execution** of combining these proven principles into a coherent whole, without the compromises forced by corporate constraints:
+BasisDB is the **disciplined execution** of combining these proven principles into a coherent whole, without the compromises forced by corporate constraints:
 - Spanner compromised: SQL-only, no foreign keys, proprietary, cloud-only
 - CockroachDB compromised: SQL-only, then went proprietary (BSL)
 - YugabyteDB compromised: SQL and KV exist but aren't unified
 - DynamoDB compromised: KV-only, eventual consistency, no transactions
 
-**Cloud9 makes no compromises.** External consistency + SQL + KV + open source + local-to-global. The theoretically optimal design, executed without corporate baggage.
+**BasisDB makes no compromises.** External consistency + SQL + KV + open source + local-to-global. The theoretically optimal design, executed without corporate baggage.
 
 ---
 
@@ -778,7 +778,7 @@ earliest ≤ absolute_true_time ≤ latest  (always)
 
 All three are reasonable assumptions with continuous monitoring.
 
-### For Cloud9
+### For BasisDB
 
 **We must do the same rigorous approach**:
 
@@ -874,7 +874,7 @@ refclock PHC /dev/ptp0 poll 3 dpoll -2 offset 0
 #### Option 4: Colocated Deployments with GPS/Atomic
 - Rent colo space (Equinix, etc.)
 - Install GPS receivers + Rubidium/Cesium atomic clocks
-- Run Cloud9 nodes with direct PTP feed
+- Run BasisDB nodes with direct PTP feed
 - **Expected ε**: <1ms (matches Spanner)
 
 **Pros**:
@@ -894,7 +894,7 @@ refclock PHC /dev/ptp0 poll 3 dpoll -2 offset 0
 - Benchmark Outposts vs native EC2
 - Evaluate Open Compute Time Appliance for colo deployments
 
-**Cloud9 deployment tiers**:
+**BasisDB deployment tiers**:
 - **Standard** (NTP): ε ≈ 50ms, works everywhere, slow writes
 - **Performance** (PTP/PHC): ε ≈ 10-20ms, Nitro instances, competitive
 - **Premium** (Outposts/Colo): ε ≈ 1-5ms, custom hardware, Spanner-class
@@ -931,13 +931,13 @@ refclock PHC /dev/ptp0 poll 3 dpoll -2 offset 0
 - Start timestamp: consistent snapshot across entire transaction
 - Lazy timestamp: each read sees "slightly newer" data, less consistent
 
-**Cloud9 choice**: Start timestamp (matches Spanner). Lazy mode can be opt-in for specific use cases.
+**BasisDB choice**: Start timestamp (matches Spanner). Lazy mode can be opt-in for specific use cases.
 
 ---
 
-## Why Cloud9 Exists: Market Pain Points
+## Why BasisDB Exists: Market Pain Points
 
-Based on extensive user feedback from production deployments of Spanner, DynamoDB, and competing systems, several consistent themes emerge that Cloud9 is designed to address.
+Based on extensive user feedback from production deployments of Spanner, DynamoDB, and competing systems, several consistent themes emerge that BasisDB is designed to address.
 
 ### Spanner Pain Points
 
@@ -952,7 +952,7 @@ Based on extensive user feedback from production deployments of Spanner, DynamoD
 
 **User quote**: *"We were paying tens of thousands of dollars a month for Spanner plus tens of thousands of dollars a month for all the compute sitting in front of it."*
 
-**Cloud9 answer**: Serverless on-demand pricing (pay per operation), plus self-hostable open-source option.
+**BasisDB answer**: Serverless on-demand pricing (pay per operation), plus self-hostable open-source option.
 
 #### 2. GCP Platform Instability
 **The Problem**:
@@ -965,7 +965,7 @@ Based on extensive user feedback from production deployments of Spanner, DynamoD
 
 **User quote**: *"Much of the time GCP feels like a science project, and not a real business."*
 
-**Cloud9 answer**: Open-source MIT license. Code can never be "shut down" by vendor. Community-driven development with stability guarantees.
+**BasisDB answer**: Open-source MIT license. Code can never be "shut down" by vendor. Community-driven development with stability guarantees.
 
 #### 3. Support Quality
 **The Problem**:
@@ -980,7 +980,7 @@ Based on extensive user feedback from production deployments of Spanner, DynamoD
 
 **User quote**: *"GCP support would suggest to ask in StackOverflow."*
 
-**Cloud9 answer**: Community-driven support via GitHub Issues/Discussions. No support tax, no gatekeepers. Open development process.
+**BasisDB answer**: Community-driven support via GitHub Issues/Discussions. No support tax, no gatekeepers. Open development process.
 
 #### 4. Documentation Gaps
 **The Problem**:
@@ -991,7 +991,7 @@ Based on extensive user feedback from production deployments of Spanner, DynamoD
 
 **User quote**: *"Google's docs are incomplete; there are lots of performance gotchas that exist throughout the entire service, and they aren't clearly documented."*
 
-**Cloud9 answer**: Comprehensive documentation from day one. Open-source allows reading the implementation. Design notes explain trade-offs.
+**BasisDB answer**: Comprehensive documentation from day one. Open-source allows reading the implementation. Design notes explain trade-offs.
 
 #### 5. Operational Complexity
 **The Problem**:
@@ -1002,7 +1002,7 @@ Based on extensive user feedback from production deployments of Spanner, DynamoD
 
 **User quote**: *"50% of time making sure we are prepared for their shit and 50% our ambitious infra plans."*
 
-**Cloud9 answer**: Single binary, minimal operational surface. Works identically local and global. No platform lock-in.
+**BasisDB answer**: Single binary, minimal operational surface. Works identically local and global. No platform lock-in.
 
 ### DynamoDB Pain Points
 
@@ -1015,7 +1015,7 @@ Based on extensive user feedback from production deployments of Spanner, DynamoD
 
 **User quote**: *"DynamoDB is fantastic for not doing things at scale... an entire RDBMS is way overkill for."*
 
-**Cloud9 answer**: Both SQL and KV. Cross-API joins. Familiar relational model when needed.
+**BasisDB answer**: Both SQL and KV. Cross-API joins. Familiar relational model when needed.
 
 #### 2. Capacity Planning Gotchas
 **The Problem**:
@@ -1026,7 +1026,7 @@ Based on extensive user feedback from production deployments of Spanner, DynamoD
 
 **User quote**: *"Even though you might have paid for 1000rps, that RPS volume is divided across all your shards."*
 
-**Cloud9 answer**: Transparent sharding with automatic rebalancing. Cross-shard transactions at same consistency level.
+**BasisDB answer**: Transparent sharding with automatic rebalancing. Cross-shard transactions at same consistency level.
 
 #### 3. No Multi-Item Transactions
 **The Problem**:
@@ -1034,7 +1034,7 @@ Based on extensive user feedback from production deployments of Spanner, DynamoD
 - No true ACID across arbitrary keys
 - Application must handle consistency
 
-**Cloud9 answer**: Unbounded multi-key transactions with strict serializability.
+**BasisDB answer**: Unbounded multi-key transactions with strict serializability.
 
 ### Common Theme: Trust and Lock-In
 
@@ -1046,7 +1046,7 @@ Based on extensive user feedback from production deployments of Spanner, DynamoD
 
 **User quote**: *"Why am I going to sign up for a service that is surely to be canceled on a Google Whim™?"*
 
-**Cloud9's fundamental answer**:
+**BasisDB's fundamental answer**:
 - Open-source MIT license removes vendor lock-in
 - Self-hostable on any infrastructure
 - Managed Dedalus Cloud offering for convenience, not lock-in
@@ -1063,7 +1063,7 @@ Based on extensive user feedback from production deployments of Spanner, DynamoD
 
 **User quote**: *"Golden Rule of data: Use PostgreSQL unless you have an extremely good reason not to."*
 
-**Cloud9's position**: Be the **Postgres of distributed databases**:
+**BasisDB's position**: Be the **Postgres of distributed databases**:
 - Open, trusted, boring technology
 - Postgres wire compatibility
 - Clear documentation and predictable behavior
@@ -1103,7 +1103,7 @@ Based on extensive user feedback from production deployments of Spanner, DynamoD
 
 **Implication**: Spanner has no **"grow into it"** story. You can't start small and scale up — the entry point is already enterprise-scale pricing.
 
-**Cloud9 answer**: Start local (SQLite-level simplicity), scale to regional, scale to global — same binary, same semantics. No cliff between "prototype" and "production."
+**BasisDB answer**: Start local (SQLite-level simplicity), scale to regional, scale to global — same binary, same semantics. No cliff between "prototype" and "production."
 
 #### The Postgres Gravitational Pull
 **The Problem**:
@@ -1115,7 +1115,7 @@ Based on extensive user feedback from production deployments of Spanner, DynamoD
 
 **User quote**: *"If you can sling postgres I'd go straight to alloydb."*
 
-**Cloud9 answer**: Postgres wire compatibility from day one. Be where developers already are, not where they have to migrate to.
+**BasisDB answer**: Postgres wire compatibility from day one. Be where developers already are, not where they have to migrate to.
 
 #### Developer Experience Friction
 **The Problem**:
@@ -1131,7 +1131,7 @@ Based on extensive user feedback from production deployments of Spanner, DynamoD
 
 **User quote**: *"Still no support for user-created stored functions/stored procs."*
 
-**Cloud9 answer**: Single binary runs locally. Develop on laptop, deploy to cloud without changes. No forced cloud-development workflow. Full Postgres compatibility from day one.
+**BasisDB answer**: Single binary runs locally. Develop on laptop, deploy to cloud without changes. No forced cloud-development workflow. Full Postgres compatibility from day one.
 
 ### What Users Actually Want
 
@@ -1146,7 +1146,7 @@ Based on extensive user feedback from production deployments of Spanner, DynamoD
 7. **Clear documentation** — performance characteristics, limits, gotchas all documented upfront
 8. **Local development** — prototype locally, deploy globally without workflow changes
 
-**Cloud9's design targets all eight points.**
+**BasisDB's design targets all eight points.**
 
 ### The Billing Horror Stories
 
@@ -1223,7 +1223,7 @@ Based on extensive user feedback from production deployments of Spanner, DynamoD
 
 **The exodus**: Users leave GCP for **$12/month VPS** rather than pay surprise Spanner bills.
 
-**Cloud9's commitment**:
+**BasisDB's commitment**:
 - **No silent defaults** — explicit opt-in for all paid tiers
 - **Visible resource usage** — every replica, every shard visible in console
 - **Billing transparency** — real-time cost tracking, no surprises
@@ -1245,7 +1245,7 @@ Based on extensive user feedback from production deployments of Spanner, DynamoD
 
 **Answer from community**: No. Spanner charges for provisioned capacity, not usage.
 
-**Cloud9 answer**:
+**BasisDB answer**:
 - Open-source = free local development
 - Managed tier pricing published upfront
 - Can "wind down" by stopping the binary (self-hosted)
@@ -1266,7 +1266,7 @@ Based on extensive user feedback from production deployments of Spanner, DynamoD
 
 **User quote**: *"All that babel about TrueTime and nowhere a description of the problem it solves."*
 
-**Cloud9 answer**: Clear design notes (this document) explain trade-offs. No hand-waving about "mastering time."
+**BasisDB answer**: Clear design notes (this document) explain trade-offs. No hand-waving about "mastering time."
 
 #### Schema Modeling Constraints
 **The Problem**:
@@ -1291,7 +1291,7 @@ Based on extensive user feedback from production deployments of Spanner, DynamoD
 
 **Google's defense**: *"ACID for Spanner means the consistency rules definable for Spanner's not-really-an-RDBMS model are upheld."*
 
-**Cloud9 answer**: Standard SQL foreign keys, constraints, and triggers. Postgres compatibility means familiar schema modeling. True ACID with full referential integrity.
+**BasisDB answer**: Standard SQL foreign keys, constraints, and triggers. Postgres compatibility means familiar schema modeling. True ACID with full referential integrity.
 
 #### Trust in Complexity
 **The Problem**:
@@ -1306,7 +1306,7 @@ Based on extensive user feedback from production deployments of Spanner, DynamoD
 
 **Answer from community**: *"Uses 6 time masters. 3 GPS clocks with individual antennas, 3 atomic clocks. Kalman filter rejects bad GPS, falls back to atomic."*
 
-**Cloud9 answer**:
+**BasisDB answer**:
 - Works without atomic clocks (HLC on commodity hardware)
 - Clear failure modes documented
 - Benefits obvious from prototype to production (same binary)
@@ -1323,7 +1323,7 @@ Based on extensive user feedback from production deployments of Spanner, DynamoD
 
 **The Spanner problem**: No story for "start with Postgres, grow into Spanner." It's a hard cut-over.
 
-**Cloud9's answer**:
+**BasisDB's answer**:
 - **Is** Postgres for small scale (wire-compatible, single binary)
 - Grows to Spanner-class scale without migration
 - No "Postgres vs Spanner" decision — it's both
@@ -1370,10 +1370,10 @@ Based on extensive user feedback from production deployments of Spanner, DynamoD
 - Users want technology that feels appropriate to their scale
 - Spanner positioned as "big company tech" → small companies avoid it
 
-**Cloud9's advantage**:
+**BasisDB's advantage**:
 - Same binary from prototype (500 RPS) to massive scale (500k RPS)
 - No psychological barrier
-- "Just use Cloud9" → natural default like "just use Postgres"
+- "Just use BasisDB" → natural default like "just use Postgres"
 - Pricing scales with you (free → cheap → expensive as you grow)
 
 ### Cloud SQL Performance Issues
@@ -1409,7 +1409,7 @@ Based on extensive user feedback from production deployments of Spanner, DynamoD
 
 **Recommendation given**: CloudSQL with read replicas (back to where they started).
 
-**Cloud9 answer**:
+**BasisDB answer**:
 - Lock-free read-only transactions by default (documented clearly)
 - MVCC means readers never block writers
 - Works locally for testing before cloud deployment
@@ -1428,7 +1428,7 @@ Based on extensive user feedback from production deployments of Spanner, DynamoD
 
 **Quote**: *"Do you have billions of dollars? [No] That would be awesome lol - but no."*
 
-**Cloud9's positioning**:
+**BasisDB's positioning**:
 - Fills the gap between CloudSQL and Spanner
 - Self-hostable (control your own performance)
 - OR managed tier (Dedalus Cloud)
