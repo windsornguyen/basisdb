@@ -1,6 +1,6 @@
-# Cloud9 Vision
+# BasisDB Vision
 
-Cloud9 is an open-source Spanner and MLIR for databases.
+BasisDB is an open-source Spanner and MLIR for databases.
 
 It combines one distributed correctness plane with several database dialects
 and physical engines. The same database can serve relational, key-value,
@@ -9,7 +9,7 @@ one physical model.
 
 ## Product Contract
 
-Cloud9 targets two deployment extremes:
+BasisDB targets two deployment extremes:
 
 - Local development should feel like SQLite.
 - Distributed deployment should scale across regions and continents.
@@ -20,7 +20,7 @@ hardware-backed TrueTime.
 
 ## Database Dialects
 
-Cloud9 treats APIs as source dialects:
+BasisDB treats APIs as source dialects:
 
 - SQL for relational workloads.
 - DynamoDB-style key-value operations.
@@ -33,7 +33,7 @@ over a generic row store.
 
 ## Multi-Level IR
 
-Cloud9 uses several typed intermediate representations (IRs). This follows the
+BasisDB uses several typed intermediate representations (IRs). This follows the
 same principle as MLIR: preserve high-level meaning until a lower level can
 represent it without loss.
 
@@ -45,7 +45,7 @@ The shared layers own correctness. Specialized layers own performance.
 
 ## Core Guarantees
 
-Cloud9 is designed around:
+BasisDB is designed around:
 
 - atomic transactions across compatible dialects;
 - multi-version concurrency control (MVCC);
@@ -59,7 +59,7 @@ transaction finishes before another starts, the first must appear earlier.
 
 ## Bounded Time
 
-Cloud9 exposes a TrueTime-shaped interval API:
+BasisDB exposes a TrueTime-shaped interval API:
 
 ```text
 now() -> [earliest, latest]
@@ -71,13 +71,13 @@ ordering across machines.
 TrueTime mode requires a supported bounded-time source. The first target is AWS
 ClockBound on supported Linux EC2 hardware.
 
-Cloud9 refuses TrueTime mode when the provider is absent, unhealthy, or outside
+BasisDB refuses TrueTime mode when the provider is absent, unhealthy, or outside
 the configured uncertainty bound. There is no silent fallback to Hybrid
 Logical Clocks (HLCs).
 
 ## Performance Contract
 
-Cloud9 targets specialized-database performance by preserving specialization. A
+BasisDB targets specialized-database performance by preserving specialization. A
 columnar analytical engine should not execute through a row-oriented hot path.
 An object read should not become a document query.
 

@@ -1,6 +1,6 @@
 # Implementation Roadmap
 
-Cloud9 ships by proving one correctness layer at a time. Later phases depend on
+BasisDB ships by proving one correctness layer at a time. Later phases depend on
 the invariants established earlier.
 
 Dates are not part of this specification. A phase is complete when its exit
@@ -229,6 +229,6 @@ Every phase must provide:
 5. A recovery procedure.
 6. Reproducible performance results for performance claims.
 
-Cloud9 does not label target behavior as implemented. It does not trade a
+BasisDB does not label target behavior as implemented. It does not trade a
 documented consistency guarantee for availability without an explicit mode
 change.

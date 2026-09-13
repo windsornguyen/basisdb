@@ -42,7 +42,7 @@ node_modules/
 package-lock.json
 jepsen/store/
 jepsen/target/
-jepsen/c9-linux-*
+jepsen/bdb-linux-*
 jepsen/.lein-failures
 jepsen/.nrepl-port
 

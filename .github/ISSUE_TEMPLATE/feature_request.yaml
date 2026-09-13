@@ -5,7 +5,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thank you for suggesting a feature for Cloud9. Please provide details about what you'd like to see.
+        Thank you for suggesting a feature for BasisDB. Please provide details about what you'd like to see.
 
   - type: textarea
     attributes:

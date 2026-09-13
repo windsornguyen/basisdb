@@ -1,0 +1,33 @@
+[package]
+name = "basisdb-node"
+version = { workspace = true }
+edition = { workspace = true }
+rust-version = { workspace = true }
+license = { workspace = true }
+authors = { workspace = true }
+repository = { workspace = true }
+homepage = { workspace = true }
+description = "BasisDB replicated database node"
+
+[lints]
+workspace = true
+
+[dependencies]
+anyhow = { workspace = true }
+axum = { workspace = true }
+basisdb-core = { workspace = true }
+basisdb-raft = { workspace = true }
+basisdb-storage = { workspace = true }
+basisdb-wal = { workspace = true }
+basisdb-proto = { workspace = true }
+connectrpc = { workspace = true, features = ["axum"] }
+hmac = { workspace = true }
+tracing = { workspace = true }
+thiserror = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+tokio = { workspace = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }

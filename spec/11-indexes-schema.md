@@ -1,6 +1,6 @@
 # Catalogs, Schemas, and Projections
 
-Cloud9 stores catalog state as versioned transactional metadata. A transaction
+BasisDB stores catalog state as versioned transactional metadata. A transaction
 resolves data and metadata at one compatible snapshot.
 
 Indexes are physical projections. They are not required to use one data
@@ -112,7 +112,7 @@ Adding a nullable field may be metadata-only. Adding a validated constraint
 requires a scan. Changing an incompatible physical type requires a new
 representation and migration.
 
-Cloud9 does not label a rewrite as metadata-only to avoid operational cost.
+BasisDB does not label a rewrite as metadata-only to avoid operational cost.
 
 ## Cross-Dialect Mappings
 

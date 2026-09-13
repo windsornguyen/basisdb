@@ -1,8 +1,8 @@
-# Cloud9
+# BasisDB
 
 **An open-source Spanner and MLIR for databases.**
 
-Cloud9 is a database compiler and distributed storage system. It accepts SQL,
+BasisDB is a database compiler and distributed storage system. It accepts SQL,
 key-value, document, object, and analytical workloads. It lowers each workload
 through typed intermediate representations into a domain-specific execution
 engine.
@@ -12,7 +12,7 @@ from one codebase. The semantics stay stable as the topology changes.
 
 ## Status
 
-Cloud9 is under active development. The repository currently contains a pure
+BasisDB is under active development. The repository currently contains a pure
 Raft state machine, a durable write-ahead log, a replicated key-value service,
 and a Jepsen harness.
 
@@ -23,7 +23,7 @@ a claim that each feature is complete.
 
 ## One Database, Many Dialects
 
-Cloud9 treats database APIs as source languages:
+BasisDB treats database APIs as source languages:
 
 - SQL dialects provide relational queries and transactions.
 - DynamoDB-style APIs provide key-value and conditional operations.
@@ -38,7 +38,7 @@ and an object read need different data structures.
 ## MLIR for Databases
 
 [MLIR](https://mlir.llvm.org/) preserves domain information through multiple
-intermediate representation levels. Cloud9 applies that design to databases.
+intermediate representation levels. BasisDB applies that design to databases.
 
 ```text
 SQL | KV | document | object | analytical dialects
@@ -64,13 +64,13 @@ passes can select indexes, columnar scans, object extents, or point reads.
 
 ## Time and External Consistency
 
-Cloud9 defines a TrueTime-shaped API:
+BasisDB defines a TrueTime-shaped API:
 
 ```text
 now() -> [earliest, latest]
 ```
 
-The interval must contain real time. Cloud9 can use that bound with commit-wait
+The interval must contain real time. BasisDB can use that bound with commit-wait
 to provide external consistency, also called strict serializability.
 
 TrueTime mode is capability-gated. It starts only when the host provides a
@@ -78,7 +78,7 @@ supported bounded-time source. The first production target is
 [AWS ClockBound](https://github.com/aws/clock-bound) on supported Linux EC2
 hardware with Amazon Time Sync configured.
 
-Missing or unhealthy time support is an error. Cloud9 does not silently replace
+Missing or unhealthy time support is an error. BasisDB does not silently replace
 it with a weaker clock.
 
 Local mode does not require bounded-time hardware. It keeps the same data model
@@ -102,10 +102,10 @@ authoritative and which projections may lag.
 
 ## Local to Planetary
 
-Local Cloud9 should feel like SQLite: one binary, one directory, and no control
+Local BasisDB should feel like SQLite: one binary, one directory, and no control
 plane. A local database uses one range and one replica.
 
-Distributed Cloud9 partitions data into replicated ranges. Placement follows
+Distributed BasisDB partitions data into replicated ranges. Placement follows
 data locality and workload shape.
 
 Cross-range writes use distributed transactions. The target is to scale the
@@ -114,7 +114,7 @@ continents.
 
 ## Performance
 
-Cloud9 targets the native performance envelope of specialized systems. This is
+BasisDB targets the native performance envelope of specialized systems. This is
 a benchmark requirement, not a blanket performance claim.
 
 Every performance claim must name the workload, topology, durability mode,
@@ -125,8 +125,8 @@ contract.
 ## Build
 
 ```bash
-git clone https://github.com/windsornguyen/cloud9
-cd cloud9
+git clone https://github.com/windsornguyen/basisdb
+cd basisdb
 cargo build --release
 cargo test --workspace
 ```
@@ -134,7 +134,7 @@ cargo test --workspace
 Run the current replicated key-value node with:
 
 ```bash
-./target/release/c9 start --config cloud9.example.toml
+./target/release/bdb start --config basisdb.example.toml
 ```
 
 See [the specifications](spec/README.md) for the target design and
@@ -142,7 +142,7 @@ See [the specifications](spec/README.md) for the target design and
 
 ## License
 
-Cloud9 is released under the [MIT License](LICENSE).
+BasisDB is released under the [MIT License](LICENSE).
 
 ## References
 

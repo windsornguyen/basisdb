@@ -1,5 +1,5 @@
 [workspace]
-members = ["cloud9", "cloud9-core", "cloud9-node", "cloud9-proto", "cloud9-storage", "cloud9-wal", "consensus/cloud9-raft", "consensus/cloud9-raft-io"]
+members = ["basisdb", "basisdb-core", "basisdb-node", "basisdb-proto", "basisdb-storage", "basisdb-wal", "consensus/basisdb-raft", "consensus/basisdb-raft-io"]
 resolver = "2"
 
 [workspace.package]
@@ -8,15 +8,15 @@ edition = "2024"
 rust-version = "1.95.0"
 license = "MIT"
 authors = ["Windsor Nguyen <oss@dedaluslabs.ai>"]
-repository = "https://github.com/windsornguyen/cloud9"
-homepage = "https://dedaluslabs.ai"
+repository = "https://github.com/windsornguyen/basisdb"
+homepage = "https://basisdb.com"
 
 [workspace.lints.rust]
 unsafe_code = "warn"
 unreachable_pub = "warn"
 unexpected_cfgs = { level = "warn", check-cfg = [
     'cfg(loom)',
-    'cfg(cloud9_unstable)',
+    'cfg(basisdb_unstable)',
 ] }
 
 [workspace.lints.clippy]
@@ -43,13 +43,13 @@ unimplemented = "warn"
 
 [workspace.dependencies]
 # Internal crates
-cloud9-core = { version = "0.0.1", path = "cloud9-core" }
-cloud9-storage = { version = "0.0.1", path = "cloud9-storage" }
-cloud9-wal = { version = "0.0.1", path = "cloud9-wal" }
-cloud9-raft = { version = "0.0.1", path = "consensus/cloud9-raft" }
-cloud9-raft-io = { version = "0.0.1", path = "consensus/cloud9-raft-io" }
-cloud9-proto = { version = "0.0.1", path = "cloud9-proto" }
-cloud9-node = { version = "0.0.1", path = "cloud9-node" }
+basisdb-core = { version = "0.0.1", path = "basisdb-core" }
+basisdb-storage = { version = "0.0.1", path = "basisdb-storage" }
+basisdb-wal = { version = "0.0.1", path = "basisdb-wal" }
+basisdb-raft = { version = "0.0.1", path = "consensus/basisdb-raft" }
+basisdb-raft-io = { version = "0.0.1", path = "consensus/basisdb-raft-io" }
+basisdb-proto = { version = "0.0.1", path = "basisdb-proto" }
+basisdb-node = { version = "0.0.1", path = "basisdb-node" }
 
 # External dependencies
 anyhow = "1"

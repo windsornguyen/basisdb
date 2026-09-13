@@ -1,6 +1,6 @@
 # Timestamp Model
 
-Cloud9 uses bounded physical time for external consistency. The provider
+BasisDB uses bounded physical time for external consistency. The provider
 returns an interval that contains real UTC:
 
 ```text
@@ -30,7 +30,7 @@ The provider must guarantee:
 4. The interval width is within configured policy.
 5. Synchronization status and time-scale behavior are defined.
 
-Cloud9 validates every observable condition. The platform and provider remain
+BasisDB validates every observable condition. The platform and provider remain
 responsible for the real-time containment guarantee.
 
 ## Commit Timestamps
@@ -45,7 +45,7 @@ CommitTimestamp {
 }
 ```
 
-The physical component is at or after the provider's `latest` bound. Cloud9
+The physical component is at or after the provider's `latest` bound. BasisDB
 rounds upward when timestamp precision requires it. The logical component
 orders transactions that share a physical value.
 
@@ -54,7 +54,7 @@ among concurrent transactions.
 
 ## Commit-Wait
 
-Cloud9 may acknowledge a commit only after:
+BasisDB may acknowledge a commit only after:
 
 ```text
 now().earliest > commit_timestamp.physical
@@ -95,12 +95,12 @@ hardware-backed TrueTime or cross-machine external consistency.
 A Hybrid Logical Clock (HLC) can carry causal metadata and order events. It
 cannot prove a bound around real UTC by itself.
 
-Cloud9 may use HLC-style metadata inside a subsystem. It cannot use an HLC as a
+BasisDB may use HLC-style metadata inside a subsystem. It cannot use an HLC as a
 silent replacement for a failed bounded-time provider.
 
 ## Failure Rules
 
-Cloud9 fails closed when:
+BasisDB fails closed when:
 
 - the provider cannot return an interval;
 - provider status is unhealthy;

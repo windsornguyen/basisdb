@@ -1,6 +1,6 @@
 # External Consistency
 
-Cloud9 provides external consistency only when a valid bounded-time provider
+BasisDB provides external consistency only when a valid bounded-time provider
 is active.
 
 External consistency means transaction order respects real time. If transaction
@@ -55,7 +55,7 @@ The serialization order now respects the observed real-time order.
 A read-write transaction reads from its chosen MVCC snapshot and validates
 conflicts before commit.
 
-A read-only transaction may use an explicit timestamp after Cloud9 proves that
+A read-only transaction may use an explicit timestamp after BasisDB proves that
 all participating ranges have applied through that timestamp. A current read
 must also account for bounded-time uncertainty.
 
@@ -67,7 +67,7 @@ alone is insufficient.
 If bounded time is unavailable or outside policy, operations that promise
 external consistency fail with a typed time-source error.
 
-Cloud9 does not:
+BasisDB does not:
 
 - acknowledge first and wait later;
 - use wall-clock point estimates as bounds;

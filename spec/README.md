@@ -1,6 +1,6 @@
-# Cloud9 Specifications
+# BasisDB Specifications
 
-Cloud9 is an open-source Spanner and MLIR for databases.
+BasisDB is an open-source Spanner and MLIR for databases.
 
 These documents define the target architecture. They distinguish implemented
 behavior from planned behavior. The repository currently provides Raft, a
@@ -8,7 +8,7 @@ durable write-ahead log, replicated key-value operations, and Jepsen tests.
 
 ## Product Contract
 
-Cloud9 combines one correctness plane with several database dialects and
+BasisDB combines one correctness plane with several database dialects and
 physical engines:
 
 - SQL for relational workloads.
@@ -20,7 +20,7 @@ physical engines:
 The dialects share transactions, timestamps, identity, placement, and
 observability. They keep distinct semantics and physical layouts.
 
-Cloud9 targets local development and planetary deployment. Local mode should
+BasisDB targets local development and planetary deployment. Local mode should
 feel like SQLite. Distributed mode partitions data into Raft-replicated ranges.
 
 ## Architectural Decisions
@@ -35,7 +35,7 @@ See [07-sql-kv-unification.md](07-sql-kv-unification.md).
 
 ### Capability-gated TrueTime
 
-Cloud9 exposes a TrueTime-shaped bounded-time API:
+BasisDB exposes a TrueTime-shaped bounded-time API:
 
 ```text
 now() -> [earliest, latest]
@@ -43,7 +43,7 @@ now() -> [earliest, latest]
 
 TrueTime mode starts only with a healthy, approved bounded-time provider. The
 first production backend is AWS ClockBound on supported Linux EC2 hardware.
-Cloud9 does not substitute a Hybrid Logical Clock when that provider fails.
+BasisDB does not substitute a Hybrid Logical Clock when that provider fails.
 
 Local mode has no bounded-time hardware requirement. It does not claim
 hardware-backed TrueTime or cross-machine external consistency.

@@ -1,6 +1,6 @@
 # Multi-Version Concurrency Control
 
-Cloud9 uses multi-version concurrency control (MVCC) for transactional
+BasisDB uses multi-version concurrency control (MVCC) for transactional
 snapshots. Writes create versions instead of overwriting visible state.
 
 ## Visibility Rule
@@ -38,7 +38,7 @@ A transaction uses one snapshot across all participating ranges and physical
 engines. The snapshot includes compatible catalog and schema versions.
 
 Read-only transactions do not create intents. They may execute without
-blocking writes after Cloud9 proves that each participant can serve the chosen
+blocking writes after BasisDB proves that each participant can serve the chosen
 snapshot.
 
 Physical engines may encode versions differently. They must implement the same
@@ -56,7 +56,7 @@ Serializable read-write transactions declare or derive:
 Prepare validates that no conflicting committed version or intent invalidates
 the snapshot. Predicate validation must detect phantoms.
 
-Cloud9 aborts on an unresolvable conflict. It does not return a result from a
+BasisDB aborts on an unresolvable conflict. It does not return a result from a
 weaker isolation level.
 
 ## Garbage Collection
@@ -77,7 +77,7 @@ all older versions without that anchor can resurrect stale data.
 
 ## Long-Lived Reads
 
-Long transactions and backups hold the watermark back. Cloud9 exposes their
+Long transactions and backups hold the watermark back. BasisDB exposes their
 age and storage cost.
 
 Retention pressure may reject a new long-lived operation. It may not silently

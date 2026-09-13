@@ -1,6 +1,6 @@
 # Transaction Protocol
 
-Cloud9 uses MVCC, durable transaction records, and two-phase commit for
+BasisDB uses MVCC, durable transaction records, and two-phase commit for
 serializable transactions across ranges. A healthy bounded-time provider adds
 external consistency.
 
@@ -116,7 +116,7 @@ In TrueTime mode, the commit timestamp's physical component is at or after:
 - every participant's observed version;
 - every causally required predecessor.
 
-Cloud9 acknowledges only after a fresh interval has:
+BasisDB acknowledges only after a fresh interval has:
 
 ```text
 earliest > commit_timestamp.physical
@@ -127,7 +127,7 @@ The detailed proof is in
 
 ## Serializable Validation
 
-Cloud9 records the effects required to validate the transaction:
+BasisDB records the effects required to validate the transaction:
 
 - point reads and observed versions;
 - range reads and range generations;

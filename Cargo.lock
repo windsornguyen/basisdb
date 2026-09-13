@@ -306,15 +306,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a1d728cc89cf3aee9ff92b05e62b19ee65a02b5702cff7d5a377e32c6ae29d8d"
 
 [[package]]
-name = "cloud9"
+name = "basisdb"
 version = "0.0.1"
 dependencies = [
  "clap",
- "cloud9-core",
- "cloud9-node",
- "cloud9-proto",
- "cloud9-raft",
- "cloud9-storage",
+ "basisdb-core",
+ "basisdb-node",
+ "basisdb-proto",
+ "basisdb-raft",
+ "basisdb-storage",
  "miette",
  "serde",
  "tempfile",
@@ -325,7 +325,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "cloud9-core"
+name = "basisdb-core"
 version = "0.0.1"
 dependencies = [
  "arcstr",
@@ -339,16 +339,16 @@ dependencies = [
 ]
 
 [[package]]
-name = "cloud9-node"
+name = "basisdb-node"
 version = "0.0.1"
 dependencies = [
  "anyhow",
  "axum",
- "cloud9-core",
- "cloud9-proto",
- "cloud9-raft",
- "cloud9-storage",
- "cloud9-wal",
+ "basisdb-core",
+ "basisdb-proto",
+ "basisdb-raft",
+ "basisdb-storage",
+ "basisdb-wal",
  "connectrpc",
  "hmac",
  "serde",
@@ -361,11 +361,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "cloud9-proto"
+name = "basisdb-proto"
 version = "0.0.1"
 dependencies = [
  "buffa",
- "cloud9-core",
+ "basisdb-core",
  "connectrpc",
  "connectrpc-build",
  "http-body",
@@ -373,10 +373,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "cloud9-raft"
+name = "basisdb-raft"
 version = "0.0.1"
 dependencies = [
- "cloud9-core",
+ "basisdb-core",
  "proptest",
  "proptest-state-machine",
  "serde",
@@ -384,12 +384,12 @@ dependencies = [
 ]
 
 [[package]]
-name = "cloud9-raft-io"
+name = "basisdb-raft-io"
 version = "0.0.1"
 dependencies = [
  "bytes",
- "cloud9-core",
- "cloud9-raft",
+ "basisdb-core",
+ "basisdb-raft",
  "serde",
  "serde_json",
  "shuttle",
@@ -399,16 +399,16 @@ dependencies = [
 ]
 
 [[package]]
-name = "cloud9-storage"
+name = "basisdb-storage"
 version = "0.0.1"
 dependencies = [
- "cloud9-core",
+ "basisdb-core",
  "serde",
  "tracing",
 ]
 
 [[package]]
-name = "cloud9-wal"
+name = "basisdb-wal"
 version = "0.0.1"
 dependencies = [
  "crc32fast",

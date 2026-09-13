@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to Cloud9 will be documented in this file (or folder, in the future).
+All notable changes to BasisDB will be documented in this file (or folder, in the future).
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).

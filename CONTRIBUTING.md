@@ -1,6 +1,6 @@
-# Contributing to Cloud9
+# Contributing to BasisDB
 
-Thank you for your interest in contributing to Cloud9. This document provides guidelines and instructions for setting up your development environment, running tests, and submitting changes.
+Thank you for your interest in contributing to BasisDB. This document provides guidelines and instructions for setting up your development environment, running tests, and submitting changes.
 
 ## Code of Conduct
 
@@ -22,24 +22,24 @@ This project adheres to a code of conduct that all contributors are expected to 
 ### Clone and Build
 
 ```bash
-git clone https://github.com/dedalus-labs/cloud9
-cd cloud9
+git clone https://github.com/windsornguyen/basisdb
+cd basisdb
 cargo build
 ```
 
-### Running Cloud9
+### Running BasisDB
 
 ```bash
 # Single-node instance
-cargo run --bin c9 -- start --config cloud9.example.toml
+cargo run --bin bdb -- start --config basisdb.example.toml
 
 # With debug logging
-RUST_LOG=debug cargo run --bin c9 -- start --config cloud9.example.toml
+RUST_LOG=debug cargo run --bin bdb -- start --config basisdb.example.toml
 ```
 
 ## Testing
 
-Cloud9 has a multi-layered test strategy to ensure correctness and reliability.
+BasisDB has a multi-layered test strategy to ensure correctness and reliability.
 
 ### Unit Tests
 
@@ -50,7 +50,7 @@ Unit tests live alongside implementation code and cover individual components.
 cargo test --workspace
 
 # Run tests for a specific crate
-cargo test -p cloud9-kv
+cargo test -p basisdb-kv
 
 # Run a specific test
 cargo test test_mvcc_snapshot_isolation
@@ -77,7 +77,7 @@ Loom tests explore all possible thread interleavings to catch concurrency bugs.
 RUSTFLAGS="--cfg loom" cargo test --release --lib loom
 
 # Run specific loom test
-RUSTFLAGS="--cfg loom" cargo test --release -p cloud9-txn loom_lock_manager
+RUSTFLAGS="--cfg loom" cargo test --release -p basisdb-txn loom_lock_manager
 ```
 
 **Note**: Loom tests are expensive. Set limits for faster iteration:
@@ -91,13 +91,13 @@ Deterministic simulation tests run the full system in a virtual environment with
 
 ```bash
 # Run simulation tests
-cargo test -p cloud9-sim --release
+cargo test -p basisdb-sim --release
 
 # Run specific scenario
-cargo test -p cloud9-sim --release test_partition_during_commit
+cargo test -p basisdb-sim --release test_partition_during_commit
 
 # Long chaos run
-cargo test -p cloud9-sim --release --ignored
+cargo test -p basisdb-sim --release --ignored
 ```
 
 ### Property Tests
@@ -118,11 +118,11 @@ External consistency checkers validate distributed correctness properties.
 
 ```bash
 # Run Jepsen harness (requires Docker)
-cargo build --release -p cloud9-jepsen
+cargo build --release -p basisdb-jepsen
 docker compose -f tests/jepsen/docker-compose.yml up
 
 # Analyze history
-cargo run -p cloud9-jepsen -- check history.edn
+cargo run -p basisdb-jepsen -- check history.edn
 ```
 
 ### Benchmarks
@@ -132,7 +132,7 @@ cargo run -p cloud9-jepsen -- check history.edn
 cargo bench --workspace
 
 # Run specific benchmark
-cargo bench -p cloud9-kv mvcc_write_throughput
+cargo bench -p basisdb-kv mvcc_write_throughput
 ```
 
 ### Full Test Suite
@@ -149,12 +149,12 @@ cargo fmt --all -- --check
 RUSTFLAGS="--cfg loom" cargo test --release --lib loom
 
 # Simulation (quick)
-cargo test -p cloud9-sim --release
+cargo test -p basisdb-sim --release
 ```
 
 ## Code Style
 
-Cloud9 follows standard Rust conventions with additional rules defined in `clippy.toml` and `rustfmt.toml`.
+BasisDB follows standard Rust conventions with additional rules defined in `clippy.toml` and `rustfmt.toml`.
 
 ### Formatting
 
@@ -203,18 +203,18 @@ pub async fn commit(&self, txn_id: TxnId, commit_ts: Timestamp) -> Result<(), Co
 ## Project Structure
 
 ```
-cloud9/
+basisdb/
 ├── crates/
-│   ├── cloud9/              # Core database binary and library
-│   ├── cloud9-kv/           # MVCC key-value storage
-│   ├── cloud9-raft/         # Consensus implementation
-│   ├── cloud9-txn/          # Transaction coordinator
-│   ├── cloud9-sql/          # SQL layer
-│   ├── cloud9-client/       # Client SDK
-│   ├── cloud9-test/         # Test utilities
-│   ├── cloud9-sim/          # Deterministic simulator
-│   ├── cloud9-jepsen/       # Jepsen harness
-│   └── cloud9-bench/        # Benchmarks
+│   ├── basisdb/              # Core database binary and library
+│   ├── basisdb-kv/           # MVCC key-value storage
+│   ├── basisdb-raft/         # Consensus implementation
+│   ├── basisdb-txn/          # Transaction coordinator
+│   ├── basisdb-sql/          # SQL layer
+│   ├── basisdb-client/       # Client SDK
+│   ├── basisdb-test/         # Test utilities
+│   ├── basisdb-sim/          # Deterministic simulator
+│   ├── basisdb-jepsen/       # Jepsen harness
+│   └── basisdb-bench/        # Benchmarks
 ├── .github/workflows/       # CI configuration
 ├── docs/                    # Additional documentation
 ├── Cargo.toml               # Workspace configuration
@@ -236,7 +236,7 @@ cloud9/
 
 ### Commit Messages
 
-Cloud9 follows [Conventional Commits](https://www.conventionalcommits.org/):
+BasisDB follows [Conventional Commits](https://www.conventionalcommits.org/):
 
 ```
 <type>(<scope>): <description>
@@ -277,7 +277,7 @@ snapshots at a timestamp that spans a range boundary.
 
 ### Versioning
 
-Cloud9 follows [Semantic Versioning](https://semver.org/):
+BasisDB follows [Semantic Versioning](https://semver.org/):
 - **MAJOR** (x.0.0): Breaking API changes
 - **MINOR** (0.x.0): New features, backward compatible
 - **PATCH** (0.0.x): Bug fixes, backward compatible
@@ -344,4 +344,4 @@ All contributions must meet these testing standards:
 
 ## License
 
-By contributing to Cloud9, you agree that your contributions will be licensed under the [MIT License](LICENSE).
+By contributing to BasisDB, you agree that your contributions will be licensed under the [MIT License](LICENSE).

@@ -1,6 +1,6 @@
 # Sharding and Placement
 
-Cloud9 partitions physical dialects into ranges. Each range is one
+BasisDB partitions physical dialects into ranges. Each range is one
 Raft-replicated state machine with an explicit placement policy.
 
 Local mode starts with one range and one replica. Distributed mode adds ranges
@@ -68,7 +68,7 @@ Ranges split when size, load, or recovery cost exceeds policy. A split:
 Adjacent ranges may merge when their placement and physical formats are
 compatible. The merge has the same atomic routing requirement.
 
-Cloud9 does not silently rewrite keys to spread a hotspot. Salting or
+BasisDB does not silently rewrite keys to spread a hotspot. Salting or
 repartitioning changes access behavior and requires an explicit schema or
 placement decision.
 
@@ -124,7 +124,7 @@ Geographic proximity is not a consistency proof.
 
 ## Hotspots
 
-Cloud9 can respond to a hotspot by:
+BasisDB can respond to a hotspot by:
 
 - splitting at a measured boundary;
 - moving the leader;
