@@ -1,0 +1,35 @@
+BasisDB
+-------
+
+An experimental database in Rust. Pre-release.
+
+The goal is SQLite-like local use, Spanner-style distributed transactions,
+and SQL, KV, document, object and analytical interfaces over typed IRs.
+Each interface keeps its semantics and lowers to specialized operators
+and data layouts. Think MLIR for databases.
+
+Current code includes a pure Raft state machine, a segmented WAL, a
+replicated KV service and a Jepsen harness. SQL, MVCC, distributed
+transactions and bounded-time integration are not implemented yet.
+
+TrueTime-style guarantees will require a supported bounded-time source.
+The first target is AWS ClockBound on supported EC2 hardware.
+
+Build
+-----
+Requires Rust 1.95+ and protoc.
+
+    git clone https://github.com/windsornguyen/basisdb
+    cd basisdb
+    cargo build --release --locked
+    cargo test --workspace --locked
+    ./target/release/bdb start --config basisdb.example.toml
+
+Notes
+-----
+Design: spec/
+Contributing: CONTRIBUTING.md
+Jepsen: jepsen/README.md
+
+Named for a basis: a minimal spanning set.
+MIT license. See LICENSE.
