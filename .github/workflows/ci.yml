@@ -19,6 +19,29 @@ env:
   RUST_BACKTRACE: 1
 
 jobs:
+  console:
+    name: Developer console
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: console
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: console/package-lock.json
+      - name: Install protoc
+        run: sudo apt-get update && sudo apt-get install --yes protobuf-compiler
+      - run: npm ci
+      - run: npm audit
+      - run: npm run generate
+      - name: Check generated client
+        run: git diff --exit-code -- src/gen
+      - run: npm test
+      - run: npm run build
+
   lint:
     name: Lint
     runs-on: ubuntu-latest
