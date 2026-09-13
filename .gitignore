@@ -36,10 +36,15 @@ Thumbs.db
 
 # Documentation
 /site
+/references
 
 # Node (commitlint)
 node_modules/
 package-lock.json
+!/console/package-lock.json
+/console/dist/
+/console/test-results/
+/console/playwright-report/
 jepsen/store/
 jepsen/target/
 jepsen/bdb-linux-*

@@ -1,0 +1,5 @@
+src/gen/
+dist/
+public/mockServiceWorker.js
+src/*.css
+package-lock.json

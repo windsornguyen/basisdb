@@ -5,3 +5,7 @@
 *.yaml text eol=lf
 *.yml text eol=lf
 *.json text eol=lf
+
+# Preserve protoc-gen-es output, including its trailing blank line.
+console/src/gen/** linguist-generated=true whitespace=-blank-at-eof
+console/public/mockServiceWorker.js linguist-generated=true
