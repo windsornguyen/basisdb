@@ -83,7 +83,8 @@ Behavior changes need focused tests. A regression test should demonstrate the
 failure before the fix and exercise the corrected invariant afterward. Name
 the precise workload and conditions for any performance or correctness claim.
 
-Use Conventional Commits, such as `fix(raft): preserve committed log entries`.
+Use Conventional Commits, such as `fix(consensus): preserve committed log entries`.
+See the [commit workflow](.agents/skills/commit/SKILL.md) for scope selection and validation.
 Follow the [pull request template](.github/PULL_REQUEST_TEMPLATE.md), document
 breaking changes, and include the checks you ran. All workspace crates share
 one release version.
