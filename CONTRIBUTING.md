@@ -35,6 +35,7 @@ is `basisdb.toml`.
 | `consensus/basisdb-raft/` | I/O-free Raft state machine |
 | `consensus/basisdb-raft-io/` | Consensus I/O contracts and client helpers |
 | `jepsen/` | Clojure harness for testing the public KV service |
+| `console/` | TypeScript developer console and generated API client |
 | `spec/` | Target architecture and implementation order |
 
 ## Checks
@@ -74,6 +75,8 @@ cluster and checking its execution history. Follow the
 [Jepsen instructions](jepsen/README.md) to build the Linux binary and run a test.
 
 ## Changes and Review
+
+Console development and its checks are documented in [console/README.md](console/README.md).
 
 Keep changes small and scoped to one behavior. Prefer explicit invariants,
 typed errors, and the existing interfaces. Keep source files under 500 lines

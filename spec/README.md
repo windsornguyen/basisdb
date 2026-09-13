@@ -76,6 +76,7 @@ correctness contract.
 11. [Consensus and replication](10-consensus.md)
 12. [Catalogs, schemas, and projections](11-indexes-schema.md)
 13. [Implementation roadmap](12-implementation-roadmap.md)
+14. [Developer console](13-developer-console.md)
 
 ## Specification Map
 
@@ -94,6 +95,7 @@ correctness contract.
 | [10-consensus.md](10-consensus.md) | Raft persistence and replication |
 | [11-indexes-schema.md](11-indexes-schema.md) | Catalog, schema, index, and projection lifecycle |
 | [12-implementation-roadmap.md](12-implementation-roadmap.md) | Dependency-ordered delivery plan |
+| [13-developer-console.md](13-developer-console.md) | Public API client, data workflows, and capability boundaries |
 
 ## Status Language
 

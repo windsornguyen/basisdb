@@ -2,6 +2,11 @@
 
 BasisDB is an open-source Spanner and MLIR for databases.
 
+The name comes from linear algebra: a basis spans a space without redundant
+vectors. The engineering goal is the same: a small, understandable core that
+supports many workloads. Correctness, clear interfaces, and measured performance
+take priority over feature count.
+
 It combines one distributed correctness plane with several database dialects
 and physical engines. The same database can serve relational, key-value,
 document, object, and analytical workloads without reducing every workload to

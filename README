@@ -30,6 +30,7 @@ Notes
 Design: spec/
 Contributing: CONTRIBUTING.md
 Jepsen: jepsen/README.md
+Console: console/README.md
 
 Named for a basis: a minimal spanning set.
 MIT license. See LICENSE.
