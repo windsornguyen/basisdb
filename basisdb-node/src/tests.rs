@@ -87,6 +87,18 @@ async fn invariant_mutation_sequence_identifies_exact_request() -> Result<()> {
     assert_eq!(200, status);
     assert!(body.contains("\"body\":\"Mg==\""));
 
+    let (status, body) = post_json(addr, "ListNamespaces", r#"{"limit":1}"#)?;
+    assert_eq!(200, status);
+    let namespaces: serde_json::Value = serde_json::from_str(&body)?;
+    assert_eq!(namespaces["namespaces"][0]["name"], "jepsen");
+    assert_eq!(namespaces["namespaces"][0]["keyCount"], "1");
+    let (status, body) = post_json(addr, "List", r#"{"namespace":"jepsen","prefix":"reg"}"#)?;
+    assert_eq!(200, status);
+    let listing: serde_json::Value = serde_json::from_str(&body)?;
+    assert_eq!(listing["entries"][0]["key"], "register");
+    assert!(listing["entries"][0].get("body").is_none());
+    assert_eq!(400, post_json(addr, "List", r#"{"namespace":"jepsen","limit":101}"#)?.0);
+
     let stale_etag = r#"{"clientId":"1","sequence":"4","namespace":"jepsen","key":"register","body":"Mw==","ifMatch":"\"c9-1\""}"#;
     assert_eq!(400, post_json(addr, "Put", stale_etag)?.0);
 
@@ -122,6 +134,18 @@ async fn invariant_restart_recovers_committed_state() -> Result<()> {
         })
         .await?;
 
+    runtime
+        .propose(KvCommand::Put {
+            client_id,
+            sequence: 2,
+            namespace: "test".to_owned(),
+            key: "key".to_owned(),
+            body: b"replacement".to_vec(),
+            if_match: "\"c9-1\"".to_owned(),
+            if_none_match: false,
+        })
+        .await?;
+
     driver.abort();
     let _ = driver.await;
     drop(runtime);
@@ -138,7 +162,8 @@ async fn invariant_restart_recovers_committed_state() -> Result<()> {
         .entries
         .get(&KvName::new("test", "key")?)
         .ok_or_else(|| anyhow::anyhow!("recovered key is missing"))?;
-    assert_eq!(b"value", record.body.as_slice());
+    assert_eq!(b"replacement", record.body.as_slice());
+    assert_eq!("\"c9-2\"", record.etag);
 
     recovered_driver.abort();
     Ok(())

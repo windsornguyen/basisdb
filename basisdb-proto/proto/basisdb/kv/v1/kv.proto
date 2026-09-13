@@ -22,6 +22,12 @@ service KvService {
 
   // Status returns node-local service status.
   rpc Status(StatusRequest) returns (StatusResponse);
+
+  // Each page observes a committed read barrier; cursors do not pin a snapshot.
+  rpc ListNamespaces(ListNamespacesRequest) returns (ListNamespacesResponse);
+
+  // List returns key metadata in lexical order, without fetching value bodies.
+  rpc List(ListRequest) returns (ListResponse);
 }
 
 message RegisterSessionRequest {}
@@ -97,4 +103,31 @@ message StatusResponse {
   uint64 node_id = 1;
   string mode = 2;
   uint64 key_count = 3;
+}
+
+message ListNamespacesRequest {
+  string start_after = 1;
+  uint32 limit = 2; // 0 selects 50; maximum 100.
+}
+
+message Namespace {
+  string name = 1;
+  uint64 key_count = 2;
+}
+
+message ListNamespacesResponse {
+  repeated Namespace namespaces = 1;
+  string next_start_after = 2;
+}
+
+message ListRequest {
+  string namespace = 1;
+  string prefix = 2;
+  string start_after = 3;
+  uint32 limit = 4; // 0 selects 50; maximum 100.
+}
+
+message ListResponse {
+  repeated HeadResponse entries = 1;
+  string next_start_after = 2;
 }

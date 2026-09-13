@@ -6,6 +6,7 @@
 //! Top-level orchestration for BasisDB nodes.
 
 mod auth;
+mod browse;
 mod command;
 mod config;
 mod runtime;

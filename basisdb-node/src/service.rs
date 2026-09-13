@@ -11,6 +11,9 @@ use basisdb_proto::generated::basisdb::kv::v1::{
     OwnedRegisterSessionRequestView, OwnedStatusRequestView, PutResponse, RegisterSessionResponse,
     StatusResponse,
 };
+use basisdb_proto::generated::basisdb::kv::v1::{
+    ListNamespacesResponse, ListResponse, OwnedListNamespacesRequestView, OwnedListRequestView,
+};
 use connectrpc::{ConnectError, RequestContext, Response, Router as ConnectRouter, ServiceResult};
 use tokio::net::TcpListener;
 use tokio::sync::RwLock;
@@ -81,6 +84,36 @@ pub(crate) fn kv_app(api: Arc<KvApi>) -> AxumRouter {
 
 #[allow(refining_impl_trait)]
 impl KvService for KvApi {
+    async fn list_namespaces(
+        &self,
+        _ctx: RequestContext,
+        request: OwnedListNamespacesRequestView,
+    ) -> ServiceResult<ListNamespacesResponse> {
+        let limit = crate::browse::page_limit(request.limit)?;
+        crate::browse::validate_namespace_cursor(request.start_after)?;
+        self.runtime.read_barrier().await?;
+        let state = self.state.read().await;
+        Response::ok(crate::browse::namespaces(&state, request.start_after, limit)?)
+    }
+
+    async fn list(
+        &self,
+        _ctx: RequestContext,
+        request: OwnedListRequestView,
+    ) -> ServiceResult<ListResponse> {
+        let limit = crate::browse::page_limit(request.limit)?;
+        crate::browse::validate_list(request.namespace, request.prefix, request.start_after)?;
+        self.runtime.read_barrier().await?;
+        let state = self.state.read().await;
+        Response::ok(crate::browse::entries(
+            &state,
+            request.namespace,
+            request.prefix,
+            request.start_after,
+            limit,
+        )?)
+    }
+
     async fn register_session(
         &self,
         _ctx: RequestContext,

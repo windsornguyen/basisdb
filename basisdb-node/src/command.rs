@@ -1,7 +1,7 @@
 //! Replicated KV commands and deterministic state-machine application.
 
 use std::cmp::Ordering;
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 
 use basisdb_proto::generated::basisdb::kv::v1::{
     DeleteResponse, PutResponse, RegisterSessionResponse,
@@ -47,7 +47,7 @@ pub(crate) enum KvApplyResult {
 pub(crate) struct KvState {
     next_client_id: u64,
     next_generation: u64,
-    pub(crate) entries: HashMap<KvName, KvRecord>,
+    pub(crate) entries: BTreeMap<KvName, KvRecord>,
     sessions: HashMap<u64, SessionState>,
 }
 
@@ -234,7 +234,7 @@ impl KvState {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub(crate) struct KvName {
     pub(crate) namespace: String,
     pub(crate) key: String,
